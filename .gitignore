@@ -1,0 +1,5 @@
+.venv/
+skills-lock.json
+uv.lock
+.DS_Store
+.pi/skills/
