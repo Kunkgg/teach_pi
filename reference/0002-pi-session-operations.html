@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pi 会话操作地图</title><link rel="stylesheet" href="../assets/course.css">
+</head>
+<body><main>
+<header><div class="eyebrow">Reference 0002 · 决策卡</div><h1>Pi 会话操作地图</h1><p class="lede">历史是一棵完整的树；模型每次只看到其中一条经过压缩处理的活动路径。</p></header>
+<table>
+<thead><tr><th>意图</th><th>操作</th><th>结果</th></tr></thead>
+<tbody>
+<tr><td>回到同一会话的旧节点，探索另一方案</td><td><code>/tree</code> 或 Esc Esc</td><td>同一 JSONL 文件中新增分支</td></tr>
+<tr><td>从旧的用户消息开始独立任务</td><td><code>/fork</code></td><td>创建新的 session 文件</td></tr>
+<tr><td>复制当前活动路径再继续</td><td><code>/clone</code></td><td>创建新的 session 文件</td></tr>
+<tr><td>释放上下文窗口</td><td><code>/compact</code></td><td>旧上下文被有损摘要；原始历史仍保留</td></tr>
+<tr><td>恢复其他会话</td><td><code>/resume</code> 或 <code>pi -r</code></td><td>切换 session 文件</td></tr>
+<tr><td>为会话建立可检索名称</td><td><code>/name &lt;name&gt;</code></td><td>保存显示名称</td></tr>
+<tr><td>查看文件、ID、token 与成本</td><td><code>/session</code></td><td>显示当前会话元数据</td></tr>
+</tbody>
+</table>
+<div class="callout"><strong>三个不要混淆的对象：</strong><br>Session file = 完整树；active branch = 当前根到叶路径；model context = 活动路径经 compaction 后实际发给模型的内容。</div>
+<h2>默认决策</h2>
+<ul>
+<li>只是比较方案：用 <code>/tree</code>，让替代路线留在一起。</li>
+<li>任务将长期独立演化：用 <code>/fork</code> 或 <code>/clone</code>。</li>
+<li>上下文快满：先确认关键决定已写入项目文件，再依赖自动压缩或运行 <code>/compact</code>。</li>
+</ul>
+<footer><a href="../lessons/0002-conversations-are-trees.html">返回第 2 课</a> · 来源：Pi 官方 Sessions 与 Compaction 文档</footer>
+</main></body></html>

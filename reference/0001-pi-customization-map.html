@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pi 定制选择地图</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body><main>
+<header>
+  <div class="eyebrow">Reference 0001 · 决策卡</div>
+  <h1>Pi 定制选择地图</h1>
+  <p class="lede">先找最小机制，再考虑安装。Package 是运输箱，不是第五种行为机制。</p>
+</header>
+<table>
+<thead><tr><th>需求</th><th>首选机制</th><th>判断句</th><th>典型位置</th></tr></thead>
+<tbody>
+<tr><td>每次都应知道的项目事实</td><td>Context file</td><td>“这是持续有效的背景或约束。”</td><td><code>AGENTS.md</code></td></tr>
+<tr><td>重复输入的一段任务描述</td><td>Prompt template</td><td>“我只想少打字，不改变能力。”</td><td><code>.pi/prompts/*.md</code></td></tr>
+<tr><td>按需加载的专业工作流</td><td>Skill</td><td>“模型已有工具，只需知道何时、如何使用。”</td><td><code>.pi/skills/*/SKILL.md</code></td></tr>
+<tr><td>新增工具、事件、权限或 UI</td><td>Extension</td><td>“必须改变 Pi 运行时行为。”</td><td><code>.pi/extensions/*.ts</code></td></tr>
+<tr><td>分发上述一种或多种资源</td><td>Package</td><td>“我要安装、固定版本或分享一组资源。”</td><td><code>package.json</code> 的 <code>pi</code> 字段</td></tr>
+</tbody>
+</table>
+<div class="callout"><strong>从最轻到最重：</strong>普通提示 → prompt template → context file / skill → extension。只有当现有工具无法完成任务或需要确定性的生命周期行为时，才升级到 extension。</div>
+<h2>安装前五问</h2>
+<ol>
+<li>它解决了我已经遇到的哪个具体缺口？</li>
+<li>它包含 extension 吗？若包含，它将以我的完整系统权限运行。</li>
+<li>我是否读过入口文件、依赖、安装脚本和网络行为？</li>
+<li>应全局安装，还是只在可信项目中用 <code>-l</code> 安装？</li>
+<li>是否应固定 npm 版本、Git tag 或 commit，以换取可复现性？</li>
+</ol>
+<footer><a href="../lessons/0001-pi-is-a-harness.html">返回第 1 课</a> · 来源：Pi 官方 skills、extensions、packages 文档</footer>
+</main></body>
+</html>

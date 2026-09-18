@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>第 1 课：Pi 是 harness，不是功能清单</title>
+  <link rel="stylesheet" href="../assets/course.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body><main>
+<header>
+  <div class="eyebrow">Lesson 0001 · 心智模型</div>
+  <h1>Pi 是 harness，<br>不是功能清单</h1>
+  <p class="lede">本课只建立一个判断力：面对一个需求时，知道它属于 Pi 的核心循环、说明层，还是运行时扩展层。完成后，你将能避免“先装一堆插件”的迁移陷阱。</p>
+  <div class="meta"><span>约 8 分钟</span><span>一个决策练习</span><span>无需安装</span></div>
+</header>
+
+<section>
+<h2>1. 三者共有的底层循环</h2>
+<p>Pi、Claude Code 与 OpenCode 都不是“会写代码的模型”本身，而是把模型放进一个可重复执行的 <em>agent loop</em>：收集上下文，选择行动，执行工具，再把结果交还模型继续判断。Claude Code 官方把它概括为 gather context、take action、verify results；Pi 的默认实现则把可行动作压缩到少量通用工具。</p>
+<div class="loop" aria-label="agent loop"><span>读取上下文</span><span>模型判断</span><span>调用工具</span><span>观察结果</span></div>
+<p class="sidenote">模型负责概率性的判断；harness 负责确定性的工具执行、会话保存、上下文装配与交互界面。换模型不等于换 harness，换 harness 也不等于换模型。</p>
+</section>
+
+<section>
+<h2>2. Pi 的区别是产品边界，不是另一种魔法</h2>
+<table>
+<thead><tr><th>维度</th><th>Pi</th><th>Claude Code / OpenCode</th></tr></thead>
+<tbody>
+<tr><td>默认姿态</td><td>小核心；默认给模型通用文件与 shell 工具</td><td>提供更多内建工作流、集成或编排入口</td></tr>
+<tr><td>缺失能力</td><td>明确地交给文件、CLI、skill 或 extension</td><td>更常由产品内建能力、hooks/plugins、MCP 等承接</td></tr>
+<tr><td>控制方式</td><td>通过可读文件和 TypeScript extension 组合自己的 harness</td><td>在产品规定的配置面内组合已有机制</td></tr>
+<tr><td>代价</td><td>你要自己做选择，并承担第三方代码审查</td><td>上手路径更明确，但产品预设也更多</td></tr>
+</tbody>
+</table>
+<div class="callout"><strong>关键迁移：</strong>不要问“怎样让 Pi 拥有 Claude Code 的全部功能？”先问“我的下一项真实任务缺少什么能力？”Pi 的价值恰恰来自不预先替你回答这个问题。</div>
+<p>这不是客观性能排名，而是官方文档呈现的产品取舍。详见 <a href="https://github.com/earendil-works/pi-mono/tree/main/packages/coding-agent">Pi README</a>、<a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> 与 <a href="https://opencode.ai/docs/agents">OpenCode Agents</a>。</p>
+</section>
+
+<section>
+<h2>3. 五个名字，其实只有四种机制</h2>
+<div class="grid">
+<article class="card"><h3>Context file</h3><p><code>AGENTS.md</code> 等启动时加载。放持续有效的项目事实、约束与命令。</p></article>
+<article class="card"><h3>Prompt template</h3><p>用 <code>/name</code> 展开重复提示。它节省输入，但不新增工具。</p></article>
+<article class="card"><h3>Skill</h3><p>按需加载的操作说明、脚本和参考资料。它教模型怎样使用已有能力。</p></article>
+<article class="card"><h3>Extension</h3><p>运行在 Pi 进程中的 TypeScript。可新增工具、命令、事件处理、权限门与 UI。</p></article>
+</div>
+<p><strong>Package 不是第五种行为机制。</strong>它是上述资源的安装与分发容器，可以同时装入 extensions、skills、prompts 和 themes。这个区别很重要：看到“package”不能推断它安全或轻量，必须查看里面究竟包含什么。</p>
+<p><a href="../reference/0001-pi-customization-map.html">打开可打印的《Pi 定制选择地图》→</a></p>
+</section>
+
+<section class="audit">
+<h2>你的当前基线</h2>
+<p>我们已经用 <code>pi --version</code>、<code>pi list</code> 和项目设置检查建立了起点：</p>
+<ul>
+<li>Pi <strong>0.85.1</strong></li>
+<li>全局 package：<strong>pi-web-access 0.29.0</strong>，其 manifest 声明了一个 extension</li>
+<li>当前学习项目没有 <code>.pi/settings.json</code></li>
+</ul>
+<p>这已经足够开始。尤其是 <code>pi-web-access</code> 覆盖网页、PDF、YouTube 和本地视频获取，正好触及最终学习助理的内容输入端。我们现在<strong>不再安装任何东西</strong>；后续先用真实任务验证缺口。</p>
+<pre><code># 以后自行审计基线时
+pi --version
+pi list
+pi config</code></pre>
+</section>
+
+<section class="quiz" data-quiz>
+<h2>检索练习：该选哪一层？</h2>
+<p>固定映射：A = Context file，B = Prompt template，C = Skill，D = Extension。</p>
+<div class="quiz-question" data-correct="C" data-why="这是按需使用已有 read/bash 等工具完成的一套专业流程。">
+<p>① “做 code review 时，先读规范，再按固定清单检查 diff。”</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="D" data-why="拦截 tool_call 并阻止危险命令，需要改变运行时行为。">
+<p>② “每次执行 <code>rm -rf</code> 前必须弹出确认框并可阻止调用。”</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="B" data-why="任务本身不变，只是把一段常用输入折叠成 slash command。">
+<p>③ “把我常用的提交信息生成提示缩写为 <code>/commit</code>。”</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+</section>
+
+<section class="exercise">
+<strong>本课的可交付成果</strong>
+<p>请不要只说“看完了”。在回到 Pi 后，用一句话回答：</p>
+<blockquote>“我的个人学习助理中，认知档案、内容提取流程、浏览器读取能力，分别应该先落在哪一层？为什么？”</blockquote>
+<p>我会根据你的回答纠正边界，并用它决定第 2 课是先练日常会话能力，还是先审计 <code>pi-web-access</code>。</p>
+</section>
+
+<section>
+<h2>本课唯一推荐阅读</h2>
+<p><a href="https://github.com/earendil-works/pi-mono/tree/main/packages/coding-agent">Pi Coding Agent README</a>。先只读 Philosophy 与 Customization 两节；它们最直接解释为什么 Pi 不内建 plan mode、subagents、MCP 与 permission popups。</p>
+</section>
+
+<footer>有任何概念不清楚，直接在 Pi 中追问你的老师。下一课将根据你的练习答案动态生成，而不是按固定目录推进。 · <a href="../reference/0001-pi-customization-map.html">参考卡</a></footer>
+</main></body>
+</html>

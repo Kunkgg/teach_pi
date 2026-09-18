@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>第 2 课：对话不是直线，而是一棵树</title>
+  <link rel="stylesheet" href="../assets/course.css"><script src="../assets/quiz.js" defer></script>
+</head>
+<body><main>
+<header>
+  <div class="eyebrow">Lesson 0002 · Sessions</div>
+  <h1>对话不是直线，<br>而是一棵树</h1>
+  <p class="lede">本课只练一个高频能力：安全地回到旧节点，尝试另一种思路，而不丢掉原路线。</p>
+  <div class="meta"><span>约 10 分钟</span><span>一次真实分支</span><span>无需安装</span></div>
+</header>
+
+<section>
+<h2>1. 先分清三个对象</h2>
+<div class="grid">
+<article class="card"><h3>Session file</h3><p>保存在 <code>~/.pi/agent/sessions/</code> 的 JSONL 文件。它能容纳整棵树，而非只有当前对话。</p></article>
+<article class="card"><h3>Active branch</h3><p>从根节点到当前 leaf 的一条路径。你当前就在其中一条路径上。</p></article>
+<article class="card"><h3>Model context</h3><p>真正发送给模型的内容：活动路径经过 context 构建与 compaction 后的结果。</p></article>
+<article class="card"><h3>Compaction</h3><p>有损总结旧消息以释放上下文。完整条目仍留在 session 文件，可从树中回看。</p></article>
+</div>
+<div class="callout"><strong>最容易产生的误解：</strong>模型“现在看不见”一段历史，不代表 Pi “已经删除”了它。上下文窗口与持久化历史不是同一个东西。</div>
+</section>
+
+<section>
+<h2>2. 为什么这对开发有用？</h2>
+<p>在线性聊天里，你否定方案 A 再尝试方案 B，A 的大量讨论仍可能占据上下文，并影响模型。Pi 的 <code>/tree</code> 允许你回到共同祖先，在同一个 session 文件中创建 B 分支：</p>
+<pre><code>共同问题
+├── 方案 A → 实验 → 失败
+└── 方案 B → 实验 → 当前 leaf</code></pre>
+<p>切换分支时，Pi 可以为离开的分支生成摘要，把值得保留的发现带入新路径。摘要仍然是有损的，所以真正重要的设计决定应写入代码、测试、ADR 或学习记录，而不是只留在聊天中。</p>
+</section>
+
+<section class="exercise">
+<strong>动手：就在当前教学会话创建一次分支</strong>
+<ol>
+<li>读完本页后回到 Pi，输入 <code>/name pi-learning-journey</code>。</li>
+<li>输入：<code>认知档案为什么不应该永远全部塞进 AGENTS.md？</code> 等待回答。</li>
+<li>按两次 Esc 打开 <code>/tree</code>，选中刚才那条用户问题。</li>
+<li>编辑为：<code>假设认知档案将增长到 10 万字，为什么不应该全部塞进 AGENTS.md？</code> 然后提交。</li>
+<li>再次打开 <code>/tree</code>，观察同一父节点下的两条分支；这次取消，不切换。</li>
+<li>运行 <code>/session</code>，观察 session 文件、消息数、token 与成本。</li>
+</ol>
+<p>你将亲手验证：选择旧的<strong>用户消息</strong>时，Pi 会移动到它的父节点，并把原消息放回编辑器；修改后提交会创建新分支，而不是覆写旧历史。</p>
+</section>
+
+<section>
+<h2>3. 何时不用 /tree？</h2>
+<table>
+<thead><tr><th>需求</th><th>选择</th><th>原因</th></tr></thead>
+<tbody>
+<tr><td>在同一问题下比较两种实现</td><td><code>/tree</code></td><td>替代路线应留在同一棵树中</td></tr>
+<tr><td>从过去的问题启动长期独立任务</td><td><code>/fork</code></td><td>从旧用户消息创建新文件</td></tr>
+<tr><td>保存当前路径副本后大胆试验</td><td><code>/clone</code></td><td>复制当前 active branch 到新文件</td></tr>
+<tr><td>只是上下文接近上限</td><td><code>/compact</code></td><td>总结旧内容，不创建任务分支</td></tr>
+</tbody>
+</table>
+<p><a href="../reference/0002-pi-session-operations.html">打开可打印的《Pi 会话操作地图》→</a></p>
+</section>
+
+<section class="quiz" data-quiz>
+<h2>检索练习</h2>
+<p>固定映射：A = tree，B = fork，C = clone，D = compact。</p>
+<div class="quiz-question" data-correct="A" data-why="同一问题的替代实现适合保留在同一 session tree。" data-retry="再想一次：目标是保留同一问题的替代路线，还是建立独立任务？">
+<p>① 当前重构路线失败，想回到需求提出处尝试另一实现，同时保留失败路线。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="D" data-why="目标是缩小发送给模型的旧上下文，而不是另开路线。" data-retry="再想一次：问题出在任务分支，还是模型可见的上下文大小？">
+<p>② 工作方向没变，但长会话已逼近模型的上下文窗口。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+</section>
+
+<section>
+<h2>本课唯一推荐阅读</h2>
+<p><a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/sessions.md">Pi Sessions 官方文档</a>。重点读 “Branching with /tree” 与 “/tree, /fork, and /clone”。</p>
+</section>
+
+<footer>完成真实分支后，请告诉我：你在 <code>/tree</code> 中看到了什么，以及两条回答的差异。遇到任何不清楚之处，直接追问。 · <a href="0001-pi-is-a-harness.html">上一课</a> · <a href="../reference/0002-pi-session-operations.html">参考卡</a></footer>
+</main></body></html>
