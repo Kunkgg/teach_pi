@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>第 5 课：让 AGENTS.md 保持短而可信</title>
+  <link rel="stylesheet" href="../assets/course.css"><script src="../assets/quiz.js" defer></script>
+</head>
+<body><main>
+<header>
+  <div class="eyebrow">Lesson 0005 · Context &amp; trust</div>
+  <h1>让 AGENTS.md<br>保持短而可信</h1>
+  <p class="lede">本课只完成一个成果：为当前教学仓库写一份短小、持续有效的 <code>AGENTS.md</code>，同时看清 project trust 没有保护什么。</p>
+  <div class="meta"><span>约 18 分钟</span><span>一份真实 AGENTS.md</span><span>不新增 package</span></div>
+</header>
+
+<section>
+<h2>1. Context file 是每次都交的“项目税”</h2>
+<p>Pi 启动时会加载全局、父目录和当前目录中的 <code>AGENTS.md</code> 或 <code>CLAUDE.md</code>。同一目录若有 <code>AGENTS.override.md</code>，它会替换<strong>该目录</strong>的另外两种文件；其他目录的 context 仍照常叠加。修改后运行 <code>/reload</code> 即可重载。完整规则见 <a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/usage.md#context-files">Context Files</a>。</p>
+<div class="callout"><strong>判断标准：</strong>只有“这个项目里的多数任务都应该知道，而且不能可靠地从代码推断”的信息，才值得进入 <code>AGENTS.md</code>。</div>
+<table>
+<thead><tr><th>适合常驻</th><th>不适合常驻</th></tr></thead>
+<tbody>
+<tr><td>经过验证的 lint、test、build 命令</td><td>今天这一个任务的需求与进度</td></tr>
+<tr><td>目录边界与不能违反的项目约束</td><td>可以从 README 或配置直接读出的长篇说明</td></tr>
+<tr><td>非显而易见的安全禁令及适用范围</td><td>完整教程、聊天记录、TODO 与秘密</td></tr>
+<tr><td>项目特有的交付与验证标准</td><td>“写高质量代码”一类不可验证口号</td></tr>
+</tbody>
+</table>
+<p class="sidenote">短不是为了好看，而是为了降低陈旧信息、冲突指令和上下文占用。详细架构应放在普通项目文档里，再从 <code>AGENTS.md</code> 指向它。</p>
+</section>
+
+<section>
+<h2>2. Project trust 不决定 AGENTS.md 是否加载</h2>
+<p>这是本课最反直觉的边界：根据官方 <a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/security.md#project-trust">Security 文档</a>，即使你拒绝 trust，<code>AGENTS.md</code>、<code>CLAUDE.md</code> 与 <code>AGENTS.override.md</code> 仍会加载；除非使用 <code>--no-context-files</code> 或 <code>-nc</code>。</p>
+<div class="grid">
+<article class="card"><h3>Project trust 会挡住</h3><p>项目 <code>.pi/settings.json</code>、extensions、skills、prompts、themes、system prompt 与项目 packages。</p></article>
+<article class="card"><h3>Project trust 挡不住</h3><p>Context file 的文字、工具对本机的读写与 shell 权限，以及仓库内容中的 prompt injection。</p></article>
+</div>
+<p>因此 trust 只是<strong>启动时的输入加载门</strong>，不是 sandbox。Pi 的工具和 extension 都以启动它的用户权限运行；需要真正隔离时，应使用容器、VM 或操作系统策略。</p>
+<p>当前教学仓库已经保存为 trusted，因为它包含项目级 <code>.pi/skills</code>；但目前没有项目 <code>AGENTS.md</code>。本课只新增 context file，不更改 trust 决策。</p>
+</section>
+
+<section>
+<h2>3. 用四问过滤每一条</h2>
+<ol>
+<li><strong>常驻？</strong>多数任务都需要，还是只服务当前任务？</li>
+<li><strong>特有？</strong>这是本项目特有信息，还是通用编程常识？</li>
+<li><strong>可执行？</strong>Agent 能据此采取明确行动并验证吗？</li>
+<li><strong>值得？</strong>它带来的稳定收益值得每次占用 context 吗？</li>
+</ol>
+<p>任何一问明显为“否”，先移到普通文档、skill、任务文件或当前提示中，而不是继续扩充 <code>AGENTS.md</code>。</p>
+</section>
+
+<section class="exercise">
+<strong>动手：为当前仓库写第一份 AGENTS.md</strong>
+<ol>
+<li>回到 Pi，发送下面的只读请求：
+<pre><code>请读取 MISSION.md、NOTES.md、learning-plan.html、assets/ 和最新的 learning record，
+为当前仓库起草 AGENTS.md，但先不要写文件。
+限制：不超过 8 条规则；只保留持续有效、项目特有、可执行的信息；
+不要复制课程计划，不写一次性任务，不写通用编程常识。</code></pre></li>
+<li>逐条用“常驻、特有、可执行、值得”四问过滤。若草案过长，用 steering 发送：<br><code>继续收紧：删除能从文件直接推断的内容，并把验证命令保留为可复制执行的形式。</code></li>
+<li>确认草案至少覆盖：开始工作前读哪些状态文件、lesson/reference 如何复用 assets、修改后如何验证，以及不能擅自改动什么全局状态。</li>
+<li>批准后让 Pi 写入仓库根目录的 <code>AGENTS.md</code>，再运行 <code>git diff --check</code>。</li>
+<li>运行 <code>/reload</code>，确认通知或启动信息显示 context files 已重载。然后执行 <code>git diff -- AGENTS.md</code>，做最后一次人工审查。</li>
+</ol>
+<p>完成标准：最终文件保持一屏内；每条都能说明为什么必须“每次可见”。不要为了通过练习，把本课文字整段复制进去。</p>
+</section>
+
+<section>
+<p><a href="../reference/0005-context-and-trust.html">打开可打印的《Context file 与 Project trust 决策卡》→</a></p>
+</section>
+
+<section class="quiz" data-quiz>
+<h2>检索练习</h2>
+<p>固定映射：A = context file，B = project trust，C = sandbox，D = project doc。</p>
+<div class="quiz-question" data-correct="A" data-why="稳定且反复使用的项目验证命令适合常驻 context。" data-retry="这条信息是否应在多数项目任务中自动出现？">
+<p>① 这个仓库每次改 Python 后都必须运行一条特定的测试命令。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="D" data-why="长篇架构说明应留在普通文档，只在 AGENTS.md 中给出必要指针。" data-retry="150 行内容值得在每次请求中完整常驻吗？">
+<p>② 一份 150 行的系统架构说明，偶尔做跨模块设计时才需要。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="B" data-why="拒绝 trust 会阻止项目 extension 等受保护资源在启动时加载。" data-retry="目标是隔离整个进程，还是先阻止仓库配置改变 Pi？">
+<p>③ 打开陌生仓库时，先阻止它自动加载项目里的 extension。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="C" data-why="限制文件、凭据与网络访问需要操作系统或虚拟化边界。" data-retry="Project trust 能限制 bash 读取当前用户可访问的文件吗？">
+<p>④ 确保 agent 无法读取宿主机的个人凭据与其他仓库。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+</section>
+
+<section>
+<h2>本课唯一推荐阅读</h2>
+<p><a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/security.md">Pi Security 官方文档</a>。重点确认两句话：context files 不受 project trust 阻挡；project trust 不是 sandbox。</p>
+</section>
+
+<footer>完成后告诉我“已写入”，我会直接审查你的 <code>AGENTS.md</code> 是否短、稳定、可执行。遇到任何不清楚之处，直接追问。 · <a href="0004-model-thinking-context.html">上一课</a> · <a href="../learning-plan.html">完整学习计划</a> · <a href="../reference/0005-context-and-trust.html">参考卡</a></footer>
+</main></body></html>

@@ -4,6 +4,12 @@
 
 - [Pi Coding Agent README](https://github.com/earendil-works/pi-mono/tree/main/packages/coding-agent)
   Pi 的官方入口，覆盖默认工具、交互模式、会话、上下文文件与设计哲学。用于建立整体心智模型。
+- [Pi Usage 文档](https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/usage.md)
+  日常交互、命令、快捷键与 CLI 参数的官方说明。用于核对 model、thinking、session 与 message queue 的实际操作。
+- [Pi Settings 文档](https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/settings.md)
+  模型默认值、thinking 档位、compaction 与 scoped models 的官方配置参考。用于建立并保存最小模型切换策略。
+- [Pi Security 文档](https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/security.md)
+  解释 project trust、context file 加载边界、宿主权限与 sandbox 的官方安全模型。用于审查陌生仓库和设计隔离策略。
 - [Pi Skills 文档](https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/skills.md)
   解释 skill 的发现、渐进披露、格式与跨 harness 复用。用于迁移现有 Claude Code skills。
 - [Pi Extensions 文档](https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/extensions.md)

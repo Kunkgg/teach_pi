@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pi Context file 与 Project trust 决策卡</title><link rel="stylesheet" href="../assets/course.css">
+</head>
+<body><main>
+<header><div class="eyebrow">Reference 0005 · 边界卡</div><h1>Context file 与 Project trust</h1><p class="lede">Context file 决定模型持续看到什么；project trust 决定 Pi 是否加载项目代码型配置。两者不是同一条安全边界。</p></header>
+<h2>加载规则</h2>
+<table>
+<thead><tr><th>来源</th><th>行为</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><code>~/.pi/agent/AGENTS.md</code></td><td>全局加载</td><td>跨项目、长期稳定的个人偏好</td></tr>
+<tr><td>父目录到当前目录的 <code>AGENTS.md</code> / <code>CLAUDE.md</code></td><td>逐层拼接</td><td>仓库与子目录的事实、约束、命令</td></tr>
+<tr><td><code>AGENTS.override.md</code></td><td>只替换同目录的 <code>AGENTS.md</code> / <code>CLAUDE.md</code></td><td>该目录需要完全不同的说明时使用</td></tr>
+<tr><td><code>--no-context-files</code> / <code>-nc</code></td><td>禁用自动发现</td><td>排查 context 影响或运行隔离实验</td></tr>
+</tbody>
+</table>
+<p>修改后运行 <code>/reload</code>，或重启 Pi。</p>
+<h2>AGENTS.md 四问</h2>
+<ol>
+<li>它是否对这个项目中的多数任务持续有效？</li>
+<li>它是否项目特有，且不能可靠地从代码推断？</li>
+<li>它是否可执行、可验证，而不是模糊愿望？</li>
+<li>它是否值得占用每次请求的上下文？</li>
+</ol>
+<div class="callout"><strong>适合：</strong>验证命令、目录边界、固定约束、安全禁令。<br><strong>不适合：</strong>一次性需求、长教程、完整架构说明、任务日志、秘密、会频繁失效的细节。</div>
+<h2>Trust 到底保护什么？</h2>
+<table>
+<thead><tr><th>资源</th><th>拒绝 project trust 后</th></tr></thead>
+<tbody>
+<tr><td><code>AGENTS.md</code>、<code>CLAUDE.md</code>、<code>AGENTS.override.md</code></td><td><strong>仍会加载</strong>，除非禁用 context files</td></tr>
+<tr><td><code>.pi/settings.json</code>、项目 extensions/skills/prompts/themes、system prompt、项目 packages</td><td>跳过</td></tr>
+<tr><td>模型通过工具执行的本地读写与 shell</td><td>不受 trust 隔离</td></tr>
+</tbody>
+</table>
+<p class="sidenote">Project trust 是启动时的输入加载门，不是 sandbox，也不保证 context file 没有 prompt injection。真正的隔离要依靠容器、VM 或操作系统策略。</p>
+<footer><a href="../lessons/0005-context-files-and-trust.html">返回第 5 课</a> · 来源：Pi 官方 Usage、Quickstart 与 Security 文档</footer>
+</main></body></html>

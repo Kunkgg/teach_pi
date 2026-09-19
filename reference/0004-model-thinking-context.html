@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pi 模型、thinking 与上下文决策卡</title><link rel="stylesheet" href="../assets/course.css">
+</head>
+<body><main>
+<header><div class="eyebrow">Reference 0004 · 决策卡</div><h1>模型、thinking 与上下文</h1><p class="lede">先判断瓶颈属于能力、推理投入，还是历史负担；不要一次改三个旋钮。</p></header>
+<table>
+<thead><tr><th>观察到的问题</th><th>优先动作</th><th>Pi 操作</th></tr></thead>
+<tbody>
+<tr><td>模型胜任，只是任务更需要权衡或推理</td><td>提高 thinking</td><td><code>/thinking</code> 或 <code>Shift+Tab</code></td></tr>
+<tr><td>能力或输入类型不匹配，或提高 thinking 后仍卡住</td><td>切换模型</td><td><code>/model</code> / <code>Ctrl+L</code>；scoped models 间用 <code>Ctrl+P</code></td></tr>
+<tr><td>任务没变，但当前可见历史过长</td><td>先固化关键决定，再压缩</td><td><code>/compact [instructions]</code></td></tr>
+<tr><td>需求已经变成无关的新任务</td><td>隔离上下文</td><td><code>/new</code>，或从旧节点 <code>/fork</code></td></tr>
+</tbody>
+</table>
+<div class="callout"><strong>诊断顺序：</strong>推理深度问题 → thinking；能力边界问题 → model；历史负担问题 → compact；任务边界问题 → new/fork。</div>
+<h2>三个预算不要混成一个</h2>
+<ul>
+<li><strong>Context window：</strong>一次请求可容纳的输入与输出总空间；footer 显示当前使用量。</li>
+<li><strong>Thinking level：</strong>请求模型投入多少推理 effort/budget；可用档位由当前模型决定。</li>
+<li><strong>Output limit：</strong>模型单次最多能生成多少 token；不是“剩余上下文”的同义词。</li>
+</ul>
+<h2>当前个人策略</h2>
+<table>
+<thead><tr><th>任务</th><th>起始组合</th><th>验证重点</th></tr></thead>
+<tbody>
+<tr><td>快问</td><td><code>openai-codex/gpt-5.6-terra</code> + medium</td><td>响应延迟与一次答对率</td></tr>
+<tr><td>常规实现</td><td><code>openai-codex/gpt-5.6-sol</code> + medium</td><td>测试通过前的返工次数</td></tr>
+<tr><td>高风险难题</td><td><code>openai-codex/gpt-6-astra</code> + high</td><td>诊断证据与决策质量</td></tr>
+</tbody>
+</table>
+<p class="sidenote">这是待真实任务验证的路由策略，不是模型排名。三档保持同一 provider，先观察三次真实任务；有证据后再调整或保存默认值。</p>
+<footer><a href="../lessons/0004-model-thinking-context.html">返回第 4 课</a> · 来源：Pi 官方 README、Usage、Settings 与 Compaction 文档</footer>
+</main></body></html>

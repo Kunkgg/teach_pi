@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>第 4 课：先诊断瓶颈，再切模型</title>
+  <link rel="stylesheet" href="../assets/course.css"><script src="../assets/quiz.js" defer></script>
+</head>
+<body><main>
+<header>
+  <div class="eyebrow">Lesson 0004 · Runtime choices</div>
+  <h1>先诊断瓶颈，<br>再切模型</h1>
+  <p class="lede">本课只建立一个操作习惯：把“能力不够”“推理不够”和“上下文太重”分开处理，形成你的最小切换策略。</p>
+  <div class="meta"><span>约 15 分钟</span><span>一次运行时切换</span><span>暂不改默认设置</span></div>
+</header>
+
+<section>
+<h2>1. 三个旋钮解决三类问题</h2>
+<div class="grid">
+<article class="card"><h3>Model</h3><p>决定能力边界、输入类型、上下文窗口、速度与计费方式。用 <code>/model</code> 或 <code>Ctrl+L</code> 选择。</p></article>
+<article class="card"><h3>Thinking</h3><p>控制当前模型的推理 effort/budget。用 <code>/thinking</code> 或 <code>Shift+Tab</code> 切换；模型支持的档位可能不同。</p></article>
+<article class="card"><h3>Context</h3><p>是本次请求实际可见的系统提示、活动路径、工具结果与摘要。Footer 显示当前用量。</p></article>
+<article class="card"><h3>Session history</h3><p>是 JSONL 中保存的完整树。它可能比当前 model context 更完整；二者不要混淆。</p></article>
+</div>
+<p>Pi 的 <a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/usage.md#model-options">model options</a> 把 model 与 thinking 分开；<a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/compaction.md#when-it-triggers">自动 compaction</a> 则在 context 超过 <code>contextWindow - reserveTokens</code> 时处理旧消息。它们不是同一个“质量”开关。</p>
+<div class="callout"><strong>最短诊断法：</strong>模型会做但想得不够深 → 调 thinking；模型能力或输入类型不匹配 → 换 model；历史太长 → compact；任务已经无关 → new/fork。</div>
+</section>
+
+<section>
+<h2>2. 不要把 thinking 当“免费变聪明”</h2>
+<p>Thinking level 是请求模型投入的推理等级，而不是跨模型统一的刻度。Pi 暴露 <code>off</code>、<code>minimal</code>、<code>low</code>、<code>medium</code>、<code>high</code>、<code>xhigh</code>、<code>max</code>；但当前模型可以只支持其中一部分。官方 <a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/models.md#thinking-level-map">Thinking Level Map</a> 说明了不支持的档位会被隐藏、跳过或限制到可用范围。</p>
+<table>
+<thead><tr><th>任务类型</th><th>起始动作</th><th>不要做</th></tr></thead>
+<tbody>
+<tr><td>事实明确的快问、短转换</td><td>当前快速候选 + low</td><td>每次都直接 high</td></tr>
+<tr><td>常规跨文件实现</td><td>实现基线 + medium</td><td>一遇阻力就轮换模型</td></tr>
+<tr><td>架构取舍、疑难诊断、高风险变更</td><td>先 high；能力不匹配再换模型</td><td>同时换模型、thinking 和上下文</td></tr>
+</tbody>
+</table>
+<p class="sidenote">一次只改一个变量，你才知道改善来自哪里。模型名字中的 “flash”“pro”等只适合提出候选假设，不构成质量证据。</p>
+</section>
+
+<section>
+<h2>3. Context 不是越满越值得保留</h2>
+<p>长上下文可能包含已经失效的方案、大段工具输出和与当前任务无关的讨论。Pi 默认保留最近约 20k token，并为下一次响应预留 16,384 token 后再自动压缩；具体值见 <a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/settings.md#compaction">Compaction settings</a>。</p>
+<ul>
+<li>关键约束、决定和状态应先写进代码、测试、ADR 或学习记录。</li>
+<li><code>/compact</code> 是有损摘要，不是清空 session；原始历史仍在 JSONL 树中。</li>
+<li>切到 context window 不同的模型后，同一段历史占窗口的比例也会变化；看 footer，而不是凭消息条数猜。</li>
+</ul>
+</section>
+
+<section class="exercise">
+<strong>动手：建立一份暂不保存的三档策略</strong>
+<ol>
+<li>在 Pi 中运行：<br><code>!!printf '%s/%s · thinking=%s\n' "$PI_PROVIDER" "$PI_MODEL" "$PI_REASONING_LEVEL"</code><br>双感叹号让结果只显示给你，不送入模型上下文。再看 footer 的 context 使用量。</li>
+<li>按 <code>Shift+Tab</code> 切换 thinking，观察 editor 边框；再次运行上面的隐藏命令确认等级，停在 <code>low</code>。</li>
+<li>按 <code>Ctrl+P</code> 在 scoped models 中前进一次，再按 <code>Shift+Ctrl+P</code> 返回。当前配置已有 11 个 scoped models，无需新增。</li>
+<li>用 <code>/model</code> 查看模型详情，再取消；用 <code>/thinking</code> 查看当前模型真正支持的档位，再取消。</li>
+<li>把 thinking 恢复到本次任务需要的等级。<strong>这次不要按 Ctrl+S</strong>：先验证策略，再保存默认值。</li>
+<li>给我发送下面三行，并按你的偏好改写：
+<pre><code>快问：deepseek/deepseek-v4-flash + low（候选）
+实现：deepseek/deepseek-v4-pro + medium（基线）
+难题：先提高实现基线的 thinking；仍卡住再用 openai-codex/gpt-5.6-sol + high（候选）</code></pre></li>
+</ol>
+<p>反馈标准不是“哪个模型最强”，而是你能否说明每次调整针对的是能力、推理投入，还是上下文负担。随后用三次真实任务记录延迟、返工与结果，再决定是否保存默认值。</p>
+</section>
+
+<section>
+<p><a href="../reference/0004-model-thinking-context.html">打开可打印的《Pi 模型、thinking 与上下文决策卡》→</a></p>
+</section>
+
+<section class="quiz" data-quiz>
+<h2>检索练习</h2>
+<p>固定映射：A = thinking，B = model，C = compact，D = new session。</p>
+<div class="quiz-question" data-correct="A" data-why="当前模型能力匹配，只需要为复杂权衡增加推理投入。" data-retry="瓶颈是模型不会做，还是同一模型需要更深推理？">
+<p>① 当前模型能处理代码，但这次迁移包含多个互相制约的取舍。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="B" data-why="输入能力不匹配属于模型边界，不是提高 thinking 能解决的问题。" data-retry="提高推理投入能让不支持图片的模型获得图片输入吗？">
+<p>② 当前模型不支持图片，但任务必须分析一张界面截图。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="C" data-why="任务方向未变，只是旧历史挤占窗口；先固化决定，再压缩。" data-retry="这是能力问题，还是当前任务的历史负担？">
+<p>③ 同一实现任务持续很久，footer 显示上下文逼近当前模型上限。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="D" data-why="无关的新工作应隔离上下文，而不是让旧任务继续占据活动路径。" data-retry="新需求是否还属于当前任务的同一条工作路径？">
+<p>④ 当前修复已结束，现在要开始一个无关项目的需求分析。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+</section>
+
+<section>
+<h2>本课唯一推荐阅读</h2>
+<p><a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/settings.md#model--thinking">Pi Settings：Model &amp; Thinking</a>。只读这一节；需要自定义 provider 时再读 Custom Models。</p>
+</section>
+
+<footer>完成切换后，把你的三档策略发给我；任何一步与实际界面不一致，也请直接追问。 · <a href="0003-steer-the-running-agent.html">上一课</a> · <a href="0005-context-files-and-trust.html">下一课</a> · <a href="../learning-plan.html">完整学习计划</a> · <a href="../reference/0004-model-thinking-context.html">参考卡</a></footer>
+</main></body></html>
