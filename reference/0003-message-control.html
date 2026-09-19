@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pi 运行中消息控制卡</title><link rel="stylesheet" href="../assets/course.css">
+</head>
+<body><main>
+<header><div class="eyebrow">Reference 0003 · 决策卡</div><h1>Pi 运行中消息控制卡</h1><p class="lede">先判断消息是在改变当前任务，还是新增下一项任务。</p></header>
+<table>
+<thead><tr><th>意图</th><th>默认操作</th><th>效果</th></tr></thead>
+<tbody>
+<tr><td>改变当前任务的方向、范围或约束</td><td>输入消息，按 <code>Enter</code></td><td>作为 steering，在当前 turn 的工具调用结束后送达</td></tr>
+<tr><td>当前任务完成后再做一件事</td><td>输入消息，按 <code>Alt+Enter</code></td><td>作为 follow-up，在全部当前工作结束后送达</td></tr>
+<tr><td>修改尚未送达的队列消息</td><td><code>Alt+Up</code></td><td>取回编辑器</td></tr>
+<tr><td>当前执行已无价值或可能有害</td><td><code>Escape</code></td><td>中止运行，并把队列消息恢复到编辑器</td></tr>
+</tbody>
+</table>
+<div class="callout"><strong>记忆句：</strong>改现在 = Enter；加以后 = Alt+Enter；改队列 = Alt+Up；立刻停 = Escape。</div>
+<h2>安全边界</h2>
+<ul>
+<li>Abort 不会回滚已经发生的文件修改、命令或网络副作用。</li>
+<li>默认 steering 与 follow-up 都逐条送达；除非出现真实需求，不必改成一次送达全部。</li>
+<li>队列只用于短期交互。独立且长期的任务应使用新 session、fork 或项目任务文件。</li>
+</ul>
+<footer><a href="../lessons/0003-steer-the-running-agent.html">返回第 3 课</a> · 来源：Pi README、Usage、Settings 与 Keybindings 官方文档</footer>
+</main></body></html>

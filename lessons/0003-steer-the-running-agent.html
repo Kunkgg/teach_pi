@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>第 3 课：在运行中 steer，而不是重启</title>
+  <link rel="stylesheet" href="../assets/course.css"><script src="../assets/quiz.js" defer></script>
+</head>
+<body><main>
+<header>
+  <div class="eyebrow">Lesson 0003 · Agent loop</div>
+  <h1>在运行中 steer，<br>而不是重启</h1>
+  <p class="lede">本课只练一个高频能力：当 agent 正在工作时，判断一条新消息应该改变当前路线、排到任务之后，还是立即中止。</p>
+  <div class="meta"><span>约 12 分钟</span><span>一次消息队列实验</span><span>无需改设置</span></div>
+</header>
+
+<section>
+<h2>1. “正在运行”不是不可打断的黑盒</h2>
+<p>一次任务通常包含多个模型回合：模型决定调用工具，Pi 执行工具，再把结果交给模型继续判断。等待整个任务结束后才纠正方向，可能已经产生了无用读取、修改或测试。</p>
+<div class="loop" aria-label="running agent loop"><span>模型判断</span><span>调用工具</span><span>观察结果</span><span>继续判断</span></div>
+<p>Pi 的消息队列让你在这个循环仍在运行时表达三种不同意图：</p>
+<div class="grid">
+<article class="card"><h3>Steering</h3><p>“当前任务方向要变。”Agent 完成本轮正在执行的工具调用后收到消息，再据此继续。</p></article>
+<article class="card"><h3>Follow-up</h3><p>“当前任务照常完成，之后再做这件事。”消息等现有工作全部结束后才送达。</p></article>
+<article class="card"><h3>Abort</h3><p>“现在就停。”中止当前运行，并把排队消息恢复到编辑器。</p></article>
+<article class="card"><h3>Dequeue</h3><p>“这条还没发送的队列消息我要改。”把排队消息取回编辑器。</p></article>
+</div>
+</section>
+
+<section>
+<h2>2. 四个操作，一条判断线</h2>
+<table>
+<thead><tr><th>你的真实意图</th><th>操作</th><th>送达时机</th></tr></thead>
+<tbody>
+<tr><td>修正范围、约束或方向</td><td>输入后按 <code>Enter</code></td><td>当前 assistant turn 的工具调用结束后</td></tr>
+<tr><td>当前任务完成后再做另一件事</td><td>输入后按 <code>Alt+Enter</code></td><td>Agent 完成全部当前工作后</td></tr>
+<tr><td>取回尚在队列里的消息</td><td><code>Alt+Up</code></td><td>不送达，回到编辑器</td></tr>
+<tr><td>立即中止当前运行</td><td><code>Escape</code></td><td>立即发出中止，并恢复队列消息</td></tr>
+</tbody>
+</table>
+<div class="callout"><strong>最短判断法：</strong>改变“正在做的事”用 steering；增加“接下来做的事”用 follow-up；继续执行已经没有价值时才 abort。</div>
+<p class="sidenote"><strong>Abort 不是事务回滚。</strong>已经完成的文件修改、shell 命令或外部请求不会因为按 Escape 自动撤销。中止后先检查工作区与外部状态，再决定恢复或修复。</p>
+</section>
+
+<section class="exercise">
+<strong>动手：在当前教学仓库观察队列</strong>
+<p>先把下面三段文字放在手边，以便快速发送。整个实验只要求分析，不修改文件。</p>
+<ol>
+<li>先发送：<br><code>请对照 MISSION.md 检查 lessons、learning-records 和 reference，报告已覆盖目标、主要缺口与下一步；不要修改文件。</code></li>
+<li>趁 agent 仍显示工作状态，输入下面这句并按普通 <code>Enter</code>：<br><code>调整当前范围：不要分析 reference，只比较 MISSION.md、lessons 与 learning-records。</code></li>
+<li>紧接着输入下面这句并按 <code>Alt+Enter</code>：<br><code>当前审查结束后，再单独给我一个不超过 3 条的下一步清单。</code></li>
+<li>观察：范围修正是否在审查尚未结束时生效；3 条清单是否等到审查完成后才成为下一项工作。</li>
+</ol>
+<p>若仓库太小、第一项瞬间完成，请在真实开发项目中换成一个需要多次工具调用的只读任务。不要为了练习而人为加入 sleep。</p>
+</section>
+
+<section>
+<h2>3. 队列不是任务管理器</h2>
+<p>默认的 <code>steeringMode</code> 与 <code>followUpMode</code> 都是 <code>one-at-a-time</code>：Pi 每次送达一条并等待响应。也可以在 <code>/settings</code> 中改为 <code>all</code>，但现在没有必要。</p>
+<ul>
+<li>队列适合处理执行期间出现的少量新信息，不适合堆放长期 TODO。</li>
+<li>如果新需求已经变成独立任务，用新 session、<code>/fork</code> 或项目文件记录，比连续塞 follow-up 更清晰。</li>
+<li>如果只是想改一条尚未送达的消息，先用 <code>Alt+Up</code>，不必 abort 整个任务。</li>
+</ul>
+<p><a href="../reference/0003-message-control.html">打开可打印的《Pi 运行中消息控制卡》→</a></p>
+</section>
+
+<section class="quiz" data-quiz>
+<h2>检索练习</h2>
+<p>固定映射：A = steering，B = follow-up，C = abort，D = dequeue。</p>
+<div class="quiz-question" data-correct="A" data-why="这是对当前实现范围的修正，应在下一次模型判断前送达。" data-retry="这条信息是在改变当前任务，还是新增后续任务？">
+<p>① Agent 正在重构，但你发现它不应该修改公共 API。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="B" data-why="先让当前测试分析结束，再生成提交说明，是顺序明确的下一项工作。" data-retry="它需要改变当前分析，还是等分析完成后再开始？">
+<p>② 当前测试分析完成之后，再根据最终结果生成提交说明。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+<div class="quiz-question" data-correct="C" data-why="继续执行可能扩大损害，应立即停止；随后仍要检查已经产生的副作用。" data-retry="如果命令继续执行会扩大损害，还应该等待当前 turn 吗？">
+<p>③ 你发现正在执行的命令指向了错误的生产环境。</p>
+<div class="quiz-options"><button data-answer="A" aria-pressed="false">选项 A</button><button data-answer="B" aria-pressed="false">选项 B</button><button data-answer="C" aria-pressed="false">选项 C</button><button data-answer="D" aria-pressed="false">选项 D</button></div><div class="feedback" aria-live="polite"></div>
+</div>
+</section>
+
+<section>
+<h2>本课唯一推荐阅读</h2>
+<p><a href="https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/docs/usage.md#message-queue">Pi Usage：Message Queue</a>。只需读这一小节；需要改键时再查 Keybindings。</p>
+</section>
+
+<footer>完成实验后，请告诉我两件事：steering 实际在哪个工具调用之后生效，以及 follow-up 是否等到了当前任务结束。 · <a href="0002-conversations-are-trees.html">上一课</a> · <a href="../learning-plan.html">完整学习计划</a> · <a href="../reference/0003-message-control.html">参考卡</a></footer>
+</main></body></html>

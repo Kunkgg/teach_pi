@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pi 学习路线：从日常使用到个人学习助理</title>
+  <link rel="stylesheet" href="assets/course.css">
+</head>
+<body><main>
+<header>
+  <div class="eyebrow">Learning plan · 12 lessons</div>
+  <h1>从会用 Pi，<br>到做出学习助理</h1>
+  <p class="lede">这不是一张必须机械执行的目录。12 课是当前基于目标与已有经验得到的最短路线；每课都以一个可验证成果为结束条件。</p>
+  <div class="meta"><span>当前：2 / 12</span><span>总计约 6–9 小时</span><span>建议 2–4 周</span></div>
+</header>
+
+<section>
+<h2>路线总览</h2>
+<table>
+<thead><tr><th>阶段</th><th>章节</th><th>完成标志</th><th>预计投入</th></tr></thead>
+<tbody>
+<tr><td>Ⅰ. 核心工作流</td><td>1–4</td><td>能控制 agent loop、会话树、模型与上下文</td><td>约 1 小时</td></tr>
+<tr><td>Ⅱ. 可控的定制</td><td>5–8</td><td>能选择、审计并实现最小定制</td><td>约 2–3 小时</td></tr>
+<tr><td>Ⅲ. 学习助理 MVP</td><td>9–12</td><td>跑通“认知档案 → 内容 → 建议 → 记录”</td><td>约 3–5 小时</td></tr>
+</tbody>
+</table>
+<div class="callout"><strong>两个可停靠里程碑：</strong>只想熟练使用 Pi，可先学到第 8 课；要实现 MISSION.md 中的个人学习助理，则完成 12 课。</div>
+</section>
+
+<section>
+<h2>Ⅰ. 核心工作流</h2>
+<table>
+<thead><tr><th>课</th><th>主题</th><th>可验证成果</th><th>状态</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Pi 是 harness，不是功能清单</td><td>能区分 context、template、skill、extension、package</td><td>已完成</td></tr>
+<tr><td>2</td><td>对话是一棵树</td><td>实际创建并查看一条替代分支</td><td>已完成</td></tr>
+<tr><td>3</td><td>在运行中 steer，而不是重启</td><td>实际区分 steering、follow-up 与 abort</td><td><strong>当前</strong></td></tr>
+<tr><td>4</td><td>模型、thinking 与上下文预算</td><td>针对快问、实现、难题制定最小切换策略</td><td>待学习</td></tr>
+</tbody>
+</table>
+</section>
+
+<section>
+<h2>Ⅱ. 可控的定制</h2>
+<table>
+<thead><tr><th>课</th><th>主题</th><th>可验证成果</th></tr></thead>
+<tbody>
+<tr><td>5</td><td>Context file 与 project trust</td><td>为真实项目写出短小、可维护的 <code>AGENTS.md</code></td></tr>
+<tr><td>6</td><td>Prompt template 与 skill</td><td>迁移或精简一项已有 Claude Code 工作流</td></tr>
+<tr><td>7</td><td>第三方 package 安全审计</td><td>审查已安装的 <code>pi-web-access</code>：入口、权限、网络与版本</td></tr>
+<tr><td>8</td><td>最小 extension</td><td>用一个小扩展验证命令、事件和 UI 的边界，不堆功能</td></tr>
+</tbody>
+</table>
+</section>
+
+<section>
+<h2>Ⅲ. 学习助理 MVP</h2>
+<table>
+<thead><tr><th>课</th><th>主题</th><th>可验证成果</th></tr></thead>
+<tbody>
+<tr><td>9</td><td>认知边界的数据模型</td><td>定义“已知、模糊、未知、证据”的最小结构</td></tr>
+<tr><td>10</td><td>真实课程内容提取</td><td>从一个网页、PDF 或视频得到可追溯的结构化材料</td></tr>
+<tr><td>11</td><td>建议与学习记录闭环</td><td>生成基于证据的下一步建议，并写回学习记录</td></tr>
+<tr><td>12</td><td>端到端验收与个人配置</td><td>独立跑通一次闭环，删掉不必要配置，形成维护清单</td></tr>
+</tbody>
+</table>
+</section>
+
+<section>
+<h2>时间应该怎样理解？</h2>
+<ul>
+<li><strong>6–9 小时</strong>是动手时间，不包含把 Pi 用在日常项目中的自然练习。</li>
+<li>每周安排 2–3 次、每次 30–45 分钟，大约 <strong>2–4 周</strong>完成；集中学习可在一个周末走完，但沉淀效果通常较差。</li>
+<li>第 9–11 课存在真实未知项，尤其是登录态课程和视频转录；若原型暴露新边界，路线可能增减约 2 课。</li>
+<li>完成标准不是“读完页面”，而是交出每课列出的成果。已有经验足够时会直接跳过重复内容。</li>
+</ul>
+</section>
+
+<footer><a href="lessons/0003-steer-the-running-agent.html">进入第 3 课 →</a> · 计划依据：<a href="MISSION.md">MISSION.md</a> 与当前学习记录</footer>
+</main></body></html>
